@@ -26,19 +26,41 @@ CORS(app)
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-# Load AI model once at startup (cached)
-print("Loading AI model...")
-try:
-    model = load_model()
-    if model is None:
-        print("WARNING: Model is None - using dummy model")
-        model = load_model()  # Will create dummy model
-    print("AI model loaded successfully!")
-except Exception as e:
-    print(f"ERROR loading model: {str(e)}")
-    import traceback
-    traceback.print_exc()
-    model = None
+# Load AI model lazily (only when needed) to save memory on free tier
+# This prevents worker timeout issues on Render free tier
+print("Model will be loaded on first request to save memory...")
+model = None
+_model_loading = False
+
+def get_model():
+    """Get model instance, loading it if needed (lazy loading)"""
+    global model, _model_loading
+    if model is not None:
+        return model
+    
+    if _model_loading:
+        # Another request is already loading, wait a bit
+        import time
+        time.sleep(1)
+        return model
+    
+    _model_loading = True
+    try:
+        print("Loading AI model (lazy load)...")
+        model = load_model()
+        if model is None:
+            print("WARNING: Model is None - using dummy model")
+            model = load_model()  # Will create dummy model
+        print("AI model loaded successfully!")
+        return model
+    except Exception as e:
+        print(f"ERROR loading model: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        model = None
+        return None
+    finally:
+        _model_loading = False
 
 
 def allowed_file(filename):
@@ -138,19 +160,20 @@ def classify_image():
         else:
             return jsonify({'error': 'No image provided'}), 400
         
-        # Check if model is available
-        if model is None:
+        # Get model (lazy loading)
+        current_model = get_model()
+        if current_model is None:
             return jsonify({
                 'success': False,
                 'error': 'AI model not loaded. Please check server logs.',
-                'details': 'Model file may be missing or corrupted.'
+                'details': 'Model file may be missing or corrupted. Using dummy model.'
             }), 500
         
         # Preprocess image for AI model
         processed_image = preprocess_image(image)
         
         # Get AI prediction
-        result, confidence = predict(model, processed_image)
+        result, confidence = predict(current_model, processed_image)
         
         # Generate advice based on result
         advice = generate_advice(result, confidence)
