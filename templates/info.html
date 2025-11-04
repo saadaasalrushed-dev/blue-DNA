@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marine Info - Blue DNA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="info-page">
+    <header class="header">
+        <div class="header-content">
+            <a href="/dashboard" class="back-btn">← Back</a>
+            <h1>📚 Marine Info</h1>
+            <span class="user-name">{{ user_name }}</span>
+        </div>
+    </header>
+    
+    <main class="info-main">
+        <div class="info-container">
+            <div class="info-section">
+                <h2>🌊 Ocean Pollution Facts</h2>
+                <div class="info-card">
+                    <h3>Plastic Pollution</h3>
+                    <ul>
+                        <li>Over 8 million tons of plastic enter the ocean every year</li>
+                        <li>Plastic takes 400-1000 years to decompose</li>
+                        <li>Marine animals mistake plastic for food</li>
+                        <li>Microplastics are found in most seafood</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Oil Spills</h3>
+                    <ul>
+                        <li>Oil spills can kill marine life instantly</li>
+                        <li>Oil coats animals' feathers and fur</li>
+                        <li>It takes decades for ecosystems to recover</li>
+                        <li>One gallon of oil can contaminate 1 million gallons of water</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Clean Oceans</h3>
+                    <ul>
+                        <li>Oceans produce 70% of Earth's oxygen</li>
+                        <li>Healthy oceans support billions of people</li>
+                        <li>Beach cleanups can remove tons of trash</li>
+                        <li>Every small action makes a difference</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h2>🛡️ How You Can Help</h2>
+                <div class="info-card tips-card">
+                    <h3>Protection Tips</h3>
+                    <div class="tip-item">
+                        <span class="tip-icon">♻️</span>
+                        <div>
+                            <strong>Reduce Plastic Use</strong>
+                            <p>Use reusable bags, bottles, and containers</p>
+                        </div>
+                    </div>
+                    <div class="tip-item">
+                        <span class="tip-icon">🗑️</span>
+                        <div>
+                            <strong>Proper Disposal</strong>
+                            <p>Always dispose of trash in designated bins</p>
+                        </div>
+                    </div>
+                    <div class="tip-item">
+                        <span class="tip-icon">🧹</span>
+                        <div>
+                            <strong>Join Cleanups</strong>
+                            <p>Participate in beach cleanup events</p>
+                        </div>
+                    </div>
+                    <div class="tip-item">
+                        <span class="tip-icon">📸</span>
+                        <div>
+                            <strong>Report Pollution</strong>
+                            <p>Use AI Scanner to detect and report pollution</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h2>🤖 About AI Beach Guardian</h2>
+                <div class="info-card">
+                    <p>Blue DNA - AI Beach Guardian uses artificial intelligence to detect ocean pollution from images. Our AI model can identify:</p>
+                    <ul>
+                        <li>✅ <strong>Clean beaches</strong> - Safe and healthy</li>
+                        <li>⚠️ <strong>Plastic pollution</strong> - Needs cleanup</li>
+                        <li>🚨 <strong>Oil spills</strong> - Requires immediate action</li>
+                    </ul>
+                    <p class="highlight">Help protect our oceans by scanning and reporting pollution!</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
+

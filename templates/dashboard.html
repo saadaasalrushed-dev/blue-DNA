@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Blue DNA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="dashboard-page">
+    <header class="header">
+        <div class="header-content">
+            <h1>🌊 Blue DNA</h1>
+            <div class="user-info">
+                <span>Welcome, <strong>{{ user_name }}</strong>!</span>
+                <a href="/logout" class="btn-logout">Logout</a>
+            </div>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="dashboard-header">
+            <h2>Mission Control Center</h2>
+            <p>Choose your mission to protect our oceans</p>
+        </div>
+        
+        <!-- AI Features Highlight Section -->
+        <div class="ai-features-section">
+            <h3>🤖 AI Technology Highlights</h3>
+            <div class="ai-features-grid">
+                <div class="ai-feature-card">
+                    <div class="ai-icon">⚡</div>
+                    <h4>Fast Detection</h4>
+                    <p>AI analysis in &lt;3 seconds</p>
+                </div>
+                <div class="ai-feature-card">
+                    <div class="ai-icon">🎯</div>
+                    <h4>High Accuracy</h4>
+                    <p>85%+ classification accuracy</p>
+                </div>
+                <div class="ai-feature-card">
+                    <div class="ai-icon">🧠</div>
+                    <h4>Smart AI</h4>
+                    <p>MobileNetV2 deep learning</p>
+                </div>
+                <div class="ai-feature-card">
+                    <div class="ai-icon">📊</div>
+                    <h4>Confidence Score</h4>
+                    <p>Real-time confidence percentage</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="cards-grid">
+            <a href="/scanner" class="nav-card scanner-card">
+                <div class="card-icon">📸</div>
+                <h3>AI Scanner</h3>
+                <p>Scan beach images to detect pollution</p>
+                <div class="card-arrow">→</div>
+            </a>
+            
+            <a href="/map" class="nav-card map-card">
+                <div class="card-icon">🗺️</div>
+                <h3>Smart Map</h3>
+                <p>View UAE coastline pollution zones</p>
+                <div class="card-arrow">→</div>
+            </a>
+            
+            <a href="/info" class="nav-card info-card">
+                <div class="card-icon">📚</div>
+                <h3>Marine Info</h3>
+                <p>Learn about ocean pollution</p>
+                <div class="card-arrow">→</div>
+            </a>
+            
+            <div class="nav-card stats-card">
+                <div class="card-icon">📊</div>
+                <h3>Your Impact</h3>
+                <p id="scanCount">Scans: 0</p>
+                <div class="card-badge">New</div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <p>Blue DNA - AI Beach Guardian | Protecting Oceans Since 2025</p>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
+

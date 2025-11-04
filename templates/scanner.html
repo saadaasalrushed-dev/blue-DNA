@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Scanner - Blue DNA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="scanner-page">
+    <header class="header">
+        <div class="header-content">
+            <a href="/dashboard" class="back-btn">← Back</a>
+            <h1>📸 AI Scanner</h1>
+            <span class="user-name">{{ user_name }}</span>
+        </div>
+    </header>
+    
+    <main class="scanner-main">
+        <div class="scanner-container">
+            <!-- Camera Preview -->
+            <div class="camera-section">
+                <div class="camera-preview" id="cameraPreview">
+                    <video id="videoElement" autoplay playsinline style="display: none;"></video>
+                    <canvas id="canvasElement" style="display: none;"></canvas>
+                    <div class="camera-placeholder">
+                        <div class="placeholder-icon">📷</div>
+                        <p>Camera preview will appear here</p>
+                        <p class="placeholder-hint">Click "Start Camera" or upload an image</p>
+                    </div>
+                </div>
+                
+                <div class="camera-controls">
+                    <button id="startCameraBtn" class="btn-camera">📷 Start Camera</button>
+                    <button id="stopCameraBtn" class="btn-camera" style="display: none;">⏹️ Stop Camera</button>
+                    <button id="captureBtn" class="btn-capture" style="display: none;">📸 Capture Photo</button>
+                    <label for="fileInput" class="btn-upload">
+                        📁 Upload Image
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="result-card" id="resultCard">
+                    <div class="result-header">
+                        <h3>AI Analysis Result</h3>
+                        <button id="closeResultsBtn" class="btn-close">×</button>
+                    </div>
+                    
+                    <div class="result-content">
+                        <div class="result-icon" id="resultIcon">🌊</div>
+                        <div class="result-label" id="resultLabel">Analyzing...</div>
+                        <div class="confidence-meter">
+                            <div class="confidence-bar" id="confidenceBar"></div>
+                            <span class="confidence-text" id="confidenceText">0%</span>
+                        </div>
+                        <div class="result-advice" id="resultAdvice"></div>
+                        <div class="warning-badge" id="warningBadge" style="display: none;">
+                            ⚠️ Low Confidence - Please take another photo
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>AI is analyzing your image...</p>
+            </div>
+        </div>
+    </main>
+    
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        // Scanner-specific JavaScript
+        let stream = null;
+        const video = document.getElementById('videoElement');
+        const canvas = document.getElementById('canvasElement');
+        const startBtn = document.getElementById('startCameraBtn');
+        const stopBtn = document.getElementById('stopCameraBtn');
+        const captureBtn = document.getElementById('captureBtn');
+        const fileInput = document.getElementById('fileInput');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const resultsSection = document.getElementById('resultsSection');
+        
+        // Start camera
+        startBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                startBtn.style.display = 'none';
+                stopBtn.style.display = 'inline-block';
+                captureBtn.style.display = 'inline-block';
+                document.querySelector('.camera-placeholder').style.display = 'none';
+            } catch (error) {
+                alert('Camera access denied. Please use file upload instead.');
+            }
+        });
+        
+        // Stop camera
+        stopBtn.addEventListener('click', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            video.style.display = 'none';
+            startBtn.style.display = 'inline-block';
+            stopBtn.style.display = 'none';
+            captureBtn.style.display = 'none';
+            document.querySelector('.camera-placeholder').style.display = 'block';
+        });
+        
+        // Capture photo
+        captureBtn.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            canvas.toBlob(blob => {
+                const file = new File([blob], 'capture.jpg', { type: 'image/jpeg' });
+                analyzeImage(file);
+            });
+        });
+        
+        // File upload
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                analyzeImage(file);
+            }
+        });
+        
+        // Analyze image
+        async function analyzeImage(file) {
+            loadingSpinner.style.display = 'block';
+            resultsSection.style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            try {
+                const response = await fetch('/api/classify', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to analyze image'));
+                }
+            } catch (error) {
+                alert('Connection error: ' + error.message);
+            } finally {
+                loadingSpinner.style.display = 'none';
+            }
+        }
+        
+        // Display results
+        function displayResults(data) {
+            const resultCard = document.getElementById('resultCard');
+            const resultLabel = document.getElementById('resultLabel');
+            const confidenceText = document.getElementById('confidenceText');
+            const confidenceBar = document.getElementById('confidenceBar');
+            const resultAdvice = document.getElementById('resultAdvice');
+            const resultIcon = document.getElementById('resultIcon');
+            const warningBadge = document.getElementById('warningBadge');
+            
+            // Set result
+            resultLabel.textContent = data.result;
+            confidenceText.textContent = (data.confidence * 100).toFixed(1) + '%';
+            confidenceBar.style.width = (data.confidence * 100) + '%';
+            resultAdvice.textContent = data.advice;
+            
+            // Color coding
+            if (data.result === 'Clean') {
+                resultCard.className = 'result-card result-clean';
+                resultIcon.textContent = '✅';
+            } else if (data.result === 'Plastic') {
+                resultCard.className = 'result-card result-plastic';
+                resultIcon.textContent = '⚠️';
+            } else if (data.result === 'Oil') {
+                resultCard.className = 'result-card result-oil';
+                resultIcon.textContent = '🚨';
+            }
+            
+            // Warning badge
+            warningBadge.style.display = data.warning ? 'block' : 'none';
+            
+            resultsSection.style.display = 'block';
+        }
+        
+        // Close results
+        document.getElementById('closeResultsBtn').addEventListener('click', () => {
+            resultsSection.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
+

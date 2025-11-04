@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Map - Blue DNA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="map-page">
+    <header class="header">
+        <div class="header-content">
+            <a href="/dashboard" class="back-btn">← Back</a>
+            <h1>🗺️ Smart Map</h1>
+            <span class="user-name">{{ user_name }}</span>
+        </div>
+    </header>
+    
+    <main class="map-main">
+        <div class="map-container">
+            <div class="map-header">
+                <h2>UAE Coastline Pollution Zones</h2>
+                <p>Interactive map showing detected pollution areas</p>
+            </div>
+            
+            <div class="map-legend">
+                <div class="legend-item">
+                    <span class="legend-color clean"></span>
+                    <span>Clean Zone</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color plastic"></span>
+                    <span>Plastic Detected</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color oil"></span>
+                    <span>Oil Spill Zone</span>
+                </div>
+            </div>
+            
+            <div class="map-canvas">
+                <!-- Simplified UAE coastline map -->
+                <div class="coastline-map">
+                    <div class="zone zone-1 clean-zone" data-zone="Dubai Beach">
+                        <div class="zone-marker">📍</div>
+                        <div class="zone-info">
+                            <h4>Dubai Beach</h4>
+                            <p>Status: Clean</p>
+                            <p>Last scan: 2 days ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-2 plastic-zone" data-zone="Abu Dhabi Coast">
+                        <div class="zone-marker">📍</div>
+                        <div class="zone-info">
+                            <h4>Abu Dhabi Coast</h4>
+                            <p>Status: Plastic Detected</p>
+                            <p>Last scan: 1 day ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-3 clean-zone" data-zone="Sharjah Beach">
+                        <div class="zone-marker">📍</div>
+                        <div class="zone-info">
+                            <h4>Sharjah Beach</h4>
+                            <p>Status: Clean</p>
+                            <p>Last scan: 3 days ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-4 oil-zone" data-zone="Fujairah Port">
+                        <div class="zone-marker">📍</div>
+                        <div class="zone-info">
+                            <h4>Fujairah Port</h4>
+                            <p>Status: Oil Spill Alert</p>
+                            <p>Last scan: 5 hours ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-5 clean-zone" data-zone="Ras Al Khaimah">
+                        <div class="zone-marker">📍</div>
+                        <div class="zone-info">
+                            <h4>Ras Al Khaimah</h4>
+                            <p>Status: Clean</p>
+                            <p>Last scan: 1 week ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="map-actions">
+                <button class="btn-primary" onclick="refreshMap()">🔄 Refresh Map</button>
+                <button class="btn-secondary" onclick="reportZone()">📝 Report New Zone</button>
+            </div>
+        </div>
+    </main>
+    
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        // Map interactivity
+        document.querySelectorAll('.zone').forEach(zone => {
+            zone.addEventListener('click', function() {
+                const zoneName = this.getAttribute('data-zone');
+                alert(`Zone: ${zoneName}\nClick "Report New Zone" to submit a scan.`);
+            });
+        });
+        
+        function refreshMap() {
+            alert('Map refreshed! Check for latest pollution data.');
+        }
+        
+        function reportZone() {
+            if (confirm('Would you like to scan this zone? You will be redirected to the AI Scanner.')) {
+                window.location.href = '/scanner';
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Blue DNA - AI Beach Guardian</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home-redesign.css') }}">
+</head>
+<body class="home-page">
+    <div class="home-container">
+        <!-- Compact Header with Logos -->
+        <header class="home-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg" 
+                 alt="UAE Flag" 
+                 class="header-logo uae-flag"
+                 onerror="this.style.display='none'">
+            <div class="header-title">
+                <h1 class="main-title">🌊 Blue DNA</h1>
+                <h2 class="sub-title">AI Beach Guardian</h2>
+            </div>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTKCPA2rY1OpQmIowIC06pxyOJk1_ME0K5kg&s" 
+                 alt="School Logo" 
+                 class="header-logo school-logo"
+                 onerror="this.style.display='none'">
+        </header>
+
+        <!-- Main Content Card -->
+        <div class="main-card">
+            <!-- Song Blocks - Horizontal Layout -->
+            <div class="song-container">
+                <div class="song-block verse-block">
+                    <div class="song-icon">📱</div>
+                    <div class="song-content">
+                        <p class="song-line">"Take out your phone, join the mission</p>
+                        <p class="song-line">Blue DNA's smart vision</p>
+                        <p class="song-line">Scan the beach, AI detection</p>
+                        <p class="song-line">Marine life protection!"</p>
+                    </div>
+                </div>
+                
+                <div class="song-block chorus-block">
+                    <div class="song-icon">🎵</div>
+                    <div class="song-content">
+                        <p class="song-line">"Blue DNA! Beach Guardian!</p>
+                        <p class="song-line">Cleaning shores across the region</p>
+                        <p class="song-line">AI technology in our hands</p>
+                        <p class="song-line">Protecting UAE's precious sands!"</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tagline -->
+            <div class="tagline-block">
+                <span class="tagline-text">"Blue DNA - Your beach has a brain!"</span>
+            </div>
+
+            <!-- Welcome Text -->
+            <div class="welcome-section">
+                <p class="welcome-text">Protecting our oceans, one scan at a time</p>
+                <p class="welcome-subtitle">Enter your name to begin your mission</p>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="nameInput" 
+                        name="name" 
+                        placeholder="Enter your name" 
+                        required 
+                        autofocus
+                        class="name-input"
+                    >
+                </div>
+                <button type="submit" class="btn-mission">
+                    <span>Start Mission</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+            </form>
+            
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </div>
+        
+        <!-- Subtle Wave Background -->
+        <div class="waves">
+            <div class="wave wave1"></div>
+            <div class="wave wave2"></div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const nameInput = document.getElementById('nameInput');
+            const errorMessage = document.getElementById('errorMessage');
+            const formData = new FormData(this);
+            
+            errorMessage.style.display = 'none';
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    errorMessage.textContent = data.error || 'Login failed. Please try again.';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                errorMessage.textContent = 'Connection error. Please check your internet.';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
+
