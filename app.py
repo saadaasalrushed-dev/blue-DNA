@@ -28,8 +28,17 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 # Load AI model once at startup (cached)
 print("Loading AI model...")
-model = load_model()
-print("AI model loaded successfully!")
+try:
+    model = load_model()
+    if model is None:
+        print("WARNING: Model is None - using dummy model")
+        model = load_model()  # Will create dummy model
+    print("AI model loaded successfully!")
+except Exception as e:
+    print(f"ERROR loading model: {str(e)}")
+    import traceback
+    traceback.print_exc()
+    model = None
 
 
 def allowed_file(filename):
@@ -129,6 +138,14 @@ def classify_image():
         else:
             return jsonify({'error': 'No image provided'}), 400
         
+        # Check if model is available
+        if model is None:
+            return jsonify({
+                'success': False,
+                'error': 'AI model not loaded. Please check server logs.',
+                'details': 'Model file may be missing or corrupted.'
+            }), 500
+        
         # Preprocess image for AI model
         processed_image = preprocess_image(image)
         
@@ -149,7 +166,13 @@ def classify_image():
         
     except Exception as e:
         print(f"Error in classify_image: {str(e)}")
-        return jsonify({'error': f'Error processing image: {str(e)}'}), 500
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': f'Error processing image: {str(e)}',
+            'details': str(e)
+        }), 500
 
 
 @app.route('/api/report', methods=['POST'])
