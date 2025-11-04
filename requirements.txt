@@ -1,0 +1,22 @@
+# Blue DNA - AI Beach Guardian
+# Python Dependencies
+# Install with: pip install -r requirements.txt
+# 
+# Note: For Python 3.13, using TensorFlow 2.20.0+
+# For Python 3.9-3.11, you can use TensorFlow 2.15.0
+
+# Flask and web server
+Flask>=3.0.0
+flask-cors>=4.0.0
+Werkzeug>=3.0.1
+
+# AI/ML libraries
+# TensorFlow 2.20.0+ supports Python 3.13
+# If you have Python 3.9-3.11, use: tensorflow==2.15.0
+tensorflow>=2.20.0
+numpy>=1.26.0
+Pillow>=10.1.0
+
+# Utilities
+python-dotenv>=1.0.0
+
