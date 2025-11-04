@@ -28,26 +28,6 @@ body.home-page {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Official header on home page */
-body.home-page .official-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    z-index: 1000;
-}
-
-body.home-page .home-container {
-    padding-top: 55px; /* Space for official header */
-}
-
-/* Mobile adjustments */
-@media (max-width: 480px) {
-    body.home-page .home-container {
-        padding-top: 50px; /* Smaller header on mobile */
-    }
-}
 
 /* ===== HOME PAGE CONTAINER ===== */
 /* Note: body.home-page styles are already defined above */
