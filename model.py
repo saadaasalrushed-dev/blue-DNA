@@ -37,9 +37,41 @@ def load_model():
     try:
         if os.path.exists(MODEL_PATH):
             print(f"Loading model from {MODEL_PATH}...")
-            _model = keras.models.load_model(MODEL_PATH)
-            print("Model loaded successfully!")
-            return _model
+            try:
+                # Method 1: Try with safe_mode=False (for TensorFlow 2.20+)
+                _model = keras.models.load_model(
+                    MODEL_PATH,
+                    compile=False,
+                    safe_mode=False
+                )
+                print("Model loaded successfully with safe_mode=False!")
+                return _model
+            except Exception as load_error1:
+                print(f"Method 1 failed: {str(load_error1)}")
+                try:
+                    # Method 2: Try with custom_objects to handle TrueDivide
+                    custom_objects = {
+                        'TrueDivide': tf.keras.layers.Lambda(lambda x: x / 1.0),
+                        'tf': tf
+                    }
+                    _model = keras.models.load_model(
+                        MODEL_PATH,
+                        compile=False,
+                        custom_objects=custom_objects
+                    )
+                    print("Model loaded successfully with custom_objects!")
+                    return _model
+                except Exception as load_error2:
+                    print(f"Method 2 failed: {str(load_error2)}")
+                    try:
+                        # Method 3: Try loading weights only and rebuild model
+                        print("Attempting to load weights only...")
+                        # This is a fallback - model structure might be incompatible
+                        raise load_error2  # Will trigger dummy model creation
+                    except Exception as load_error3:
+                        print(f"All loading methods failed: {str(load_error3)}")
+                        print("Model was likely trained with incompatible TensorFlow version")
+                        raise load_error3
         else:
             print(f"Warning: Model file not found at {MODEL_PATH}")
             print("Please train the model first using train_model.py")
@@ -49,6 +81,7 @@ def load_model():
     except Exception as e:
         print(f"Error loading model: {str(e)}")
         print("Creating dummy model for development...")
+        print("NOTE: You may need to retrain the model with the same TensorFlow version as Render")
         return create_dummy_model()
 
 

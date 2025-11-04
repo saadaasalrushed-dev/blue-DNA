@@ -99,8 +99,8 @@ body.home-page {
 
 .main-title {
     font-family: 'Quicksand', sans-serif;
-    font-size: 1.8em;
-    font-weight: 700;
+    font-size: 2.2em;
+    font-weight: 800;
     color: #0066CC;
     margin: 0;
     line-height: 1.2;
@@ -109,8 +109,8 @@ body.home-page {
 
 .sub-title {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.9em;
-    font-weight: 500;
+    font-size: 1.1em;
+    font-weight: 700;
     color: #00A6A6;
     margin: 3px 0 0 0;
     letter-spacing: 0.3px;
@@ -172,18 +172,18 @@ body.home-page {
 
 .song-line {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.8em;
+    font-size: 0.95em;
     line-height: 1.4;
     color: #333;
     margin: 2px 0;
     font-style: italic;
-    font-weight: 400;
+    font-weight: 600;
     word-wrap: break-word;
 }
 
 .chorus-block .song-line {
     color: #0066CC;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 /* ===== TAGLINE ===== */
@@ -211,8 +211,8 @@ body.home-page {
 
 .tagline-text {
     font-family: 'Quicksand', sans-serif;
-    font-size: 1em;
-    font-weight: 700;
+    font-size: 1.15em;
+    font-weight: 800;
     letter-spacing: 0.3px;
     display: block;
 }
@@ -225,16 +225,16 @@ body.home-page {
 
 .welcome-text {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.95em;
-    font-weight: 500;
+    font-size: 1.1em;
+    font-weight: 600;
     color: #555;
     margin-bottom: 4px;
 }
 
 .welcome-subtitle {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.8em;
-    font-weight: 400;
+    font-size: 0.95em;
+    font-weight: 500;
     color: #888;
 }
 
@@ -255,8 +255,8 @@ body.home-page {
     border: 2px solid #e0e0e0;
     border-radius: 12px;
     font-family: 'Poppins', sans-serif;
-    font-size: 1em;
-    font-weight: 400;
+    font-size: 1.1em;
+    font-weight: 500;
     transition: all 0.3s ease;
     background: #fafafa;
     -webkit-appearance: none;
@@ -282,8 +282,8 @@ body.home-page {
     padding: 16px 30px;
     border-radius: 12px;
     font-family: 'Quicksand', sans-serif;
-    font-size: 1.05em;
-    font-weight: 700;
+    font-size: 1.2em;
+    font-weight: 800;
     cursor: pointer;
     display: flex;
     align-items: center;

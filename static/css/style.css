@@ -311,7 +311,8 @@ body {
 
 .header h1 {
     color: #0066CC;
-    font-size: 1.5em;
+    font-size: 1.8em;
+    font-weight: 800;
 }
 
 .user-info {
@@ -354,13 +355,15 @@ body {
 
 .dashboard-header h2 {
     color: #0066CC;
-    font-size: 2em;
+    font-size: 2.3em;
+    font-weight: 800;
     margin-bottom: 10px;
 }
 
 .dashboard-header p {
     color: #666;
-    font-size: 1.1em;
+    font-size: 1.2em;
+    font-weight: 600;
 }
 
 /* ===== AI FEATURES HIGHLIGHT ===== */
@@ -378,7 +381,8 @@ body {
     color: #0066CC;
     text-align: center;
     margin-bottom: 25px;
-    font-size: 1.8em;
+    font-size: 2em;
+    font-weight: 800;
 }
 
 .ai-features-grid {
@@ -410,12 +414,14 @@ body {
 .ai-feature-card h4 {
     color: #0066CC;
     margin-bottom: 8px;
-    font-size: 1.2em;
+    font-size: 1.3em;
+    font-weight: 700;
 }
 
 .ai-feature-card p {
     color: #666;
-    font-size: 0.9em;
+    font-size: 1em;
+    font-weight: 500;
 }
 
 .cards-grid {
@@ -461,12 +467,14 @@ body {
 .nav-card h3 {
     color: #0066CC;
     margin-bottom: 10px;
-    font-size: 1.3em;
+    font-size: 1.5em;
+    font-weight: 700;
 }
 
 .nav-card p {
     color: #666;
-    font-size: 0.9em;
+    font-size: 1em;
+    font-weight: 500;
 }
 
 .card-arrow {
