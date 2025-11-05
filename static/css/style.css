@@ -385,6 +385,52 @@ body {
     font-family: 'Quicksand', sans-serif;
 }
 
+/* App Logo Styles for Dashboard */
+.logo-title-container-dash {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+}
+
+.app-logo-dash {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    background: transparent;
+    transition: transform 0.3s ease;
+    display: block;
+}
+
+.app-logo-dash:hover {
+    transform: scale(1.1);
+}
+
+.app-logo-fallback-dash {
+    font-size: 1.8em;
+}
+
+/* Result Icon Logo */
+.result-icon-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    background: transparent;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Info Section Logo */
+.info-section-logo {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+    background: transparent;
+    vertical-align: middle;
+    margin-right: 8px;
+    filter: drop-shadow(0 1px 3px rgba(0, 102, 204, 0.2));
+}
+
 /* Official Info for Dashboard */
 .official-info-dash {
     display: flex !important;

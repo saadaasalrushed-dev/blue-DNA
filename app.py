@@ -4,10 +4,12 @@ Main Flask Application
 Built for student competition (Grades 5-8)
 """
 
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, g
 from flask_cors import CORS
+from flask_talisman import Talisman
 import os
 from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
 import numpy as np
 from PIL import Image
 import io
@@ -20,8 +22,66 @@ app.secret_key = os.environ.get('SECRET_KEY', 'blue-dna-ai-beach-guardian-2025')
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB max file size
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
-# Enable CORS for cross-origin requests
-CORS(app)
+# Configure for production with HTTPS
+app.config['PREFERRED_URL_SCHEME'] = 'https'
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
+# Enable CORS for cross-origin requests (with security)
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
+
+# Add security headers with Flask-Talisman
+# Configure Content Security Policy for security
+csp = {
+    'default-src': "'self'",
+    'script-src': "'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://maps.googleapis.com https://*.tile.openstreetmap.org",
+    'style-src': "'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com",
+    'img-src': "'self' data: blob: https: http:",
+    'font-src': "'self' https://fonts.gstatic.com data:",
+    'connect-src': "'self' https://*.tile.openstreetmap.org https://*.openstreetmap.org",
+    'frame-src': "'self'",
+    'object-src': "'none'",
+    'base-uri': "'self'",
+    'form-action': "'self'"
+}
+
+# Initialize Talisman with security headers - minimal for functionality
+Talisman(
+    app,
+    force_https=not app.debug,
+    strict_transport_security=True,
+    strict_transport_security_max_age=31536000,
+    content_security_policy=None,  # Disable strict CSP to allow camera/media
+    referrer_policy='strict-origin-when-cross-origin',
+    frame_options='SAMEORIGIN',  # Allow same-origin frames
+    x_content_type_options=True
+)
+
+# Handle proxy headers (for Render/Railway/etc)
+if os.environ.get('ENABLE_PROXY_FIX', 'false').lower() == 'true':
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+# Before request handler to ensure HTTPS in production
+@app.before_request
+def force_https():
+    """Force HTTPS in production"""
+    # Only force HTTPS in production (not in debug mode)
+    if not app.debug:
+        # Check if request is HTTP (should redirect to HTTPS)
+        if request.headers.get('X-Forwarded-Proto') == 'http':
+            url = request.url.replace('http://', 'https://')
+            return redirect(url, code=301)
+        # Ensure session cookies are secure
+        if not request.is_secure and request.headers.get('X-Forwarded-Proto') != 'https':
+            # In production behind proxy, trust X-Forwarded-Proto header
+            pass
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}

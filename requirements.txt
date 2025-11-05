@@ -8,6 +8,7 @@
 # Flask and web server
 Flask>=3.0.0
 flask-cors>=4.0.0
+flask-talisman>=1.1.0
 Werkzeug>=3.0.1
 
 # AI/ML libraries

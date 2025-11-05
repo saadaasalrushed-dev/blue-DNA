@@ -5,42 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Blue DNA</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/smooth-scroll.css') }}">
 </head>
 <body class="dashboard-page">
     <header class="header">
         <div class="header-content">
-            <!-- Header Top with Logos -->
-            <div class="header-top-section">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg" 
-                     alt="UAE Flag" 
-                     class="header-logo-dash uae-flag-dash"
-                     onerror="this.style.display='none'">
-                <div class="header-title-section">
-                    <h1>🌊 Blue DNA</h1>
-                    <div class="official-info-dash">
-                        <div class="official-line-dash">
-                            <span class="official-text-en-dash">Government of Sharjah</span>
-                            <span class="official-text-ar-dash">حكومــــــــــة الشارقـــــــــة</span>
-                        </div>
-                        <div class="official-line-dash">
-                            <span class="official-text-en-dash">Sharjah Private Education Authority</span>
-                            <span class="official-text-ar-dash">هيئة الشارقة للتعليم الخاص</span>
-                        </div>
-                        <div class="official-line-dash">
-                            <span class="official-text-en-dash">Al Rushed American Private School</span>
-                            <span class="official-text-ar-dash">مدرسة الرشد الأمريكية الخاصة</span>
-                        </div>
-                        <div class="competition-badge-dash">
-                            <span class="competition-text-dash">Ryan InnotechX'25 Competition</span>
-                        </div>
-                    </div>
-                </div>
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTKCPA2rY1OpQmIowIC06pxyOJk1_ME0K5kg&s" 
-                     alt="School Logo" 
-                     class="header-logo-dash school-logo-dash"
-                     onerror="this.style.display='none'">
-            </div>
+            <h1>🌊 Blue DNA</h1>
             <div class="user-info">
                 <span>Welcome, <strong>{{ user_name }}</strong>!</span>
                 <a href="/logout" class="btn-logout">Logout</a>
@@ -80,11 +49,9 @@
                 <div class="card-icon">📊</div>
                 <h3>Your Impact</h3>
                 <p id="scanCount">Scans: 0</p>
-                <div class="card-badge">New</div>
             </div>
         </div>
         
-        <!-- AI Features Highlight Section - Moved Below Cards -->
         <div class="ai-features-section">
             <h3>🤖 AI Technology Highlights</h3>
             <div class="ai-features-grid">
@@ -119,4 +86,3 @@
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
-

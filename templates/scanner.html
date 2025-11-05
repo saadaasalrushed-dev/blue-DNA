@@ -19,6 +19,10 @@
         <div class="scanner-container">
             <!-- Camera Preview -->
             <div class="camera-section">
+                <div class="section-header">
+                    <h3>📸 AI Camera Scanner</h3>
+                    <p>Capture or upload an image to analyze for pollution</p>
+                </div>
                 <div class="camera-preview" id="cameraPreview">
                     <video id="videoElement" autoplay playsinline style="display: none;"></video>
                     <canvas id="canvasElement" style="display: none;"></canvas>
@@ -30,10 +34,10 @@
                 </div>
                 
                 <div class="camera-controls">
-                    <button id="startCameraBtn" class="btn-camera">📷 Start Camera</button>
-                    <button id="stopCameraBtn" class="btn-camera" style="display: none;">⏹️ Stop Camera</button>
-                    <button id="captureBtn" class="btn-capture" style="display: none;">📸 Capture Photo</button>
-                    <label for="fileInput" class="btn-upload">
+                    <button id="startCameraBtn" class="btn-camera btn-action">📷 Start Camera</button>
+                    <button id="stopCameraBtn" class="btn-camera btn-action" style="display: none;">⏹️ Stop Camera</button>
+                    <button id="captureBtn" class="btn-capture btn-action" style="display: none;">📸 Capture Photo</button>
+                    <label for="fileInput" class="btn-upload btn-action">
                         📁 Upload Image
                         <input type="file" id="fileInput" accept="image/*" style="display: none;">
                     </label>
@@ -44,20 +48,32 @@
             <div class="results-section" id="resultsSection" style="display: none;">
                 <div class="result-card" id="resultCard">
                     <div class="result-header">
-                        <h3>AI Analysis Result</h3>
+                        <h3>🤖 AI Analysis Result</h3>
                         <button id="closeResultsBtn" class="btn-close">×</button>
                     </div>
                     
                     <div class="result-content">
-                        <div class="result-icon" id="resultIcon">🌊</div>
+                        <div class="result-icon-wrapper">
+                            <div class="result-icon" id="resultIcon">🌊</div>
+                            <div class="result-glow"></div>
+                        </div>
                         <div class="result-label" id="resultLabel">Analyzing...</div>
-                        <div class="confidence-meter">
-                            <div class="confidence-bar" id="confidenceBar"></div>
-                            <span class="confidence-text" id="confidenceText">0%</span>
+                        <div class="confidence-section">
+                            <div class="confidence-header">
+                                <span class="confidence-label">Confidence Level</span>
+                                <span class="confidence-text" id="confidenceText">0%</span>
+                            </div>
+                            <div class="confidence-meter">
+                                <div class="confidence-bar" id="confidenceBar"></div>
+                            </div>
                         </div>
                         <div class="result-advice" id="resultAdvice"></div>
                         <div class="warning-badge" id="warningBadge" style="display: none;">
                             ⚠️ Low Confidence - Please take another photo
+                        </div>
+                        <div class="result-actions">
+                            <button onclick="window.location.href='/scanner'" class="btn-scan-again">Scan Again</button>
+                            <button onclick="window.location.href='/map'" class="btn-view-map">View on Map</button>
                         </div>
                     </div>
                 </div>
@@ -67,6 +83,11 @@
             <div class="loading-spinner" id="loadingSpinner" style="display: none;">
                 <div class="spinner"></div>
                 <p>AI is analyzing your image...</p>
+                <div class="loading-progress">
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                </div>
             </div>
         </div>
     </main>
@@ -198,9 +219,20 @@
             
             // Set result
             resultLabel.textContent = data.result;
-            confidenceText.textContent = (data.confidence * 100).toFixed(1) + '%';
-            confidenceBar.style.width = (data.confidence * 100) + '%';
+            const confidencePercent = (data.confidence * 100).toFixed(1);
+            confidenceText.textContent = confidencePercent + '%';
+            confidenceBar.style.width = confidencePercent + '%';
             resultAdvice.textContent = data.advice;
+            
+            // Update scan count
+            if (typeof updateScanCount === 'function') {
+                updateScanCount();
+            }
+            
+            // Update dashboard stats if available
+            if (typeof updateDashboardStats === 'function') {
+                updateDashboardStats();
+            }
             
             // Color coding
             if (data.result === 'Clean') {
