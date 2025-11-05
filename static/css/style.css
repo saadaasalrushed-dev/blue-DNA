@@ -10,12 +10,25 @@
     box-sizing: border-box;
 }
 
+/* Hide scrollbar but keep functionality */
+* {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #0066CC 0%, #00A6A6 100%);
     min-height: 100vh;
     color: #333;
     line-height: 1.6;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ===== HOME PAGE ===== */
@@ -294,15 +307,16 @@ body {
 /* ===== HEADER ===== */
 .header {
     background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
-    box-shadow: 0 6px 25px rgba(0, 102, 204, 0.3);
-    padding: 20px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 4px solid #0066CC;
+    box-shadow: 0 2px 10px rgba(0, 102, 204, 0.15);
+    padding: 8px 12px;
+    position: relative;
+    z-index: 10;
+    border-bottom: 2px solid #0066CC;
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+    overflow: hidden;
+    max-height: none;
 }
 
 .header-content {
@@ -310,7 +324,8 @@ body {
     flex-direction: column;
     max-width: 1200px;
     margin: 0 auto;
-    gap: 15px;
+    gap: 10px;
+    width: 100%;
 }
 
 /* Header Top Section with Logos */
@@ -351,28 +366,36 @@ body {
 .header-title-section {
     flex: 1;
     text-align: center;
-    min-width: 0;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
 }
 
 .header-title-section h1 {
     color: #0066CC;
-    font-size: 2.5em;
-    font-weight: 900;
-    margin-bottom: 12px;
-    text-shadow: 0 3px 6px rgba(0, 102, 204, 0.3);
+    font-size: 1.6em;
+    font-weight: 800;
+    margin: 0;
+    text-shadow: 0 1px 3px rgba(0, 102, 204, 0.15);
+    line-height: 1.2;
+    word-break: break-word;
+    font-family: 'Quicksand', sans-serif;
 }
 
 /* Official Info for Dashboard */
 .official-info-dash {
     display: flex !important;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 12px;
-    padding: 15px;
+    gap: 5px;
+    margin-top: 8px;
+    padding: 10px 12px;
     background: white;
-    border-radius: 10px;
-    border: 2px solid #0066CC;
-    box-shadow: 0 2px 10px rgba(0, 102, 204, 0.2);
+    border-radius: 8px;
+    border: 1.5px solid #0066CC;
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.15);
     visibility: visible !important;
 }
 
@@ -387,48 +410,65 @@ body {
 
 .official-text-en-dash {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.85em;
-    font-weight: 700;
+    font-size: 0.72em;
+    font-weight: 500;
     color: #0066CC;
     flex: 1;
     text-align: left;
     line-height: 1.4;
+    min-width: 0;
+    word-break: break-word;
 }
 
 .official-text-ar-dash {
-    font-family: 'Arial', sans-serif;
-    font-size: 0.8em;
-    font-weight: 700;
+    font-family: 'Arial', 'Tahoma', sans-serif;
+    font-size: 0.68em;
+    font-weight: 500;
     color: #0066CC;
     flex: 1;
     text-align: right;
     direction: rtl;
     line-height: 1.4;
+    min-width: 0;
+    word-break: break-word;
 }
 
 .competition-badge-dash {
     display: inline-block !important;
     background: linear-gradient(135deg, #0066CC 0%, #00A6A6 100%);
     color: white;
-    padding: 8px 16px;
-    border-radius: 15px;
+    padding: 6px 12px;
+    border-radius: 12px;
     text-align: center;
-    margin-top: 10px;
+    margin-top: 6px;
     box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
     visibility: visible !important;
     width: fit-content;
     margin-left: auto;
     margin-right: auto;
+    animation: gentlePulse 3s ease-in-out infinite;
 }
 
 .competition-text-dash {
     font-family: 'Quicksand', sans-serif;
-    font-size: 0.85em;
+    font-size: 0.7em;
     font-weight: 800;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
     display: block;
+    white-space: nowrap;
+}
+
+@keyframes gentlePulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 3px 12px rgba(0, 102, 204, 0.4);
+    }
 }
 
 .user-info {
@@ -1067,22 +1107,75 @@ body {
 /* ===== RESPONSIVE DESIGN ===== */
 /* Dashboard Header Responsive */
 @media (max-width: 768px) {
+    .header {
+        padding: 10px 12px;
+    }
+    
     .header-top-section {
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
+        padding: 5px 0;
     }
     
     .header-logo-dash {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
     }
     
     .uae-flag-dash {
-        width: 70px;
+        width: 60px;
     }
     
     .header-title-section h1 {
-        font-size: 1.4em;
+        font-size: 1.2em;
+        margin-bottom: 5px;
+    }
+    
+    .official-info-dash {
+        padding: 8px 10px;
+        gap: 4px;
+    }
+    
+    .official-text-en-dash,
+    .official-text-ar-dash {
+        font-size: 0.6em;
+        line-height: 1.2;
+    }
+    
+    .competition-text-dash {
+        font-size: 0.6em;
+        padding: 5px 10px;
+    }
+    
+    .user-info {
+        flex-wrap: wrap;
+        justify-content: center;
+        font-size: 0.9em;
+        gap: 10px;
+    }
+    
+    .btn-logout {
+        padding: 6px 12px;
+        font-size: 0.85em;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 8px 10px;
+    }
+    
+    .header-logo-dash {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .uae-flag-dash {
+        width: 55px;
+    }
+    
+    .header-title-section h1 {
+        font-size: 1.1em;
     }
     
     .official-text-en-dash,
@@ -1091,12 +1184,8 @@ body {
     }
     
     .competition-text-dash {
-        font-size: 0.6em;
-    }
-    
-    .user-info {
-        flex-wrap: wrap;
-        justify-content: center;
+        font-size: 0.55em;
+        padding: 4px 8px;
     }
 }
 

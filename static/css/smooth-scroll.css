@@ -1,0 +1,33 @@
+/* Smooth Scroll and Hidden Scrollbar */
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+/* Hide scrollbar for all browsers */
+* {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+/* Ensure smooth scrolling on mobile */
+body {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+}
+
+/* Prevent horizontal scroll */
+body, html {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Smooth transitions */
+* {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
