@@ -303,22 +303,112 @@ body {
 
 .header-content {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     max-width: 1200px;
     margin: 0 auto;
+    gap: 15px;
 }
 
-.header h1 {
+/* Header Top Section with Logos */
+.header-top-section {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    width: 100%;
+}
+
+.header-logo-dash {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 10px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.uae-flag-dash {
+    width: 90px;
+    height: auto;
+    aspect-ratio: 2/1;
+}
+
+.school-logo-dash {
+    background: white;
+    padding: 6px;
+}
+
+.header-title-section {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+}
+
+.header-title-section h1 {
     color: #0066CC;
     font-size: 1.8em;
     font-weight: 800;
+    margin-bottom: 10px;
+}
+
+/* Official Info for Dashboard */
+.official-info-dash {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.official-line-dash {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.official-text-en-dash {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.65em;
+    font-weight: 600;
+    color: #0066CC;
+    flex: 1;
+    text-align: left;
+}
+
+.official-text-ar-dash {
+    font-family: 'Arial', sans-serif;
+    font-size: 0.6em;
+    font-weight: 600;
+    color: #0066CC;
+    flex: 1;
+    text-align: right;
+    direction: rtl;
+}
+
+.competition-badge-dash {
+    background: linear-gradient(135deg, #0066CC 0%, #00A6A6 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    text-align: center;
+    margin-top: 6px;
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+}
+
+.competition-text-dash {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.7em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .user-info {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 15px;
+    width: 100%;
 }
 
 .btn-logout {
@@ -947,6 +1037,41 @@ body {
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
+/* Dashboard Header Responsive */
+@media (max-width: 768px) {
+    .header-top-section {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .header-logo-dash {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .uae-flag-dash {
+        width: 70px;
+    }
+    
+    .header-title-section h1 {
+        font-size: 1.4em;
+    }
+    
+    .official-text-en-dash,
+    .official-text-ar-dash {
+        font-size: 0.55em;
+    }
+    
+    .competition-text-dash {
+        font-size: 0.6em;
+    }
+    
+    .user-info {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
 @media (max-width: 768px) {
     .logos-section {
         flex-direction: column;
