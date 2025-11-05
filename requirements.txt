@@ -9,7 +9,7 @@
 Flask>=3.0.0
 flask-cors>=4.0.0
 Werkzeug>=3.0.1
-gunicorn>=21.2.0
+
 # AI/ML libraries
 # TensorFlow 2.20.0+ supports Python 3.13
 # If you have Python 3.9-3.11, use: tensorflow==2.15.0
@@ -19,5 +19,4 @@ Pillow>=10.1.0
 
 # Utilities
 python-dotenv>=1.0.0
-
 

@@ -9,19 +9,30 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from collections import Counter
 import warnings
 warnings.filterwarnings('ignore')
+
+# Optional sklearn for detailed metrics
+try:
+    from sklearn.metrics import classification_report, confusion_matrix
+    HAS_SKLEARN = True
+except ImportError:
+    HAS_SKLEARN = False
+    print("Note: sklearn not available. Detailed metrics will be skipped.")
 
 # Configuration
 TRAINING_DATA_DIR = 'training_data'
 MODEL_SAVE_PATH = 'models/pollution_classifier.h5'
 IMAGE_SIZE = (224, 224)
-BATCH_SIZE = 16
-EPOCHS = 50  # More epochs for better learning
-LEARNING_RATE = 0.0001
+BATCH_SIZE = 4  # Even smaller batch for better gradient updates
+EPOCHS = 150  # More epochs for better learning
+LEARNING_RATE = 0.002  # Higher initial learning rate for faster convergence
+VAL_SPLIT = 0.12  # Use 88% for training, 12% for validation
 
 # Class names (must match folder names)
 CLASSES = ['clean', 'oil', 'plastic']
@@ -47,19 +58,24 @@ def create_model():
     # Build custom classification head
     inputs = keras.Input(shape=(224, 224, 3))
     
-    # Preprocess input for MobileNetV2
-    x = tf.keras.applications.mobilenet_v2.preprocess_input(inputs)
-    
-    # Base model
-    x = base_model(x, training=False)
+    # Base model (preprocessing will be done in ImageDataGenerator)
+    x = base_model(inputs, training=False)
     
     # Global average pooling
     x = GlobalAveragePooling2D()(x)
     
-    # Dropout for regularization
-    x = Dropout(0.2)(x)
+    # Batch normalization for better training
+    x = keras.layers.BatchNormalization()(x)
     
-    # Dense layer
+    # Dropout for regularization
+    x = Dropout(0.3)(x)
+    
+    # First dense layer with more neurons
+    x = Dense(256, activation='relu')(x)
+    x = keras.layers.BatchNormalization()(x)
+    x = Dropout(0.4)(x)
+    
+    # Second dense layer
     x = Dense(128, activation='relu')(x)
     x = Dropout(0.3)(x)
     
@@ -69,10 +85,22 @@ def create_model():
     # Create model
     model = keras.Model(inputs, outputs)
     
-    # Compile model
+    # Compile model with focal loss for better handling of class imbalance
+    # Focal loss focuses learning on hard examples
+    def focal_loss(gamma=2.0, alpha=0.25):
+        def focal_loss_fixed(y_true, y_pred):
+            epsilon = tf.keras.backend.epsilon()
+            y_pred = tf.clip_by_value(y_pred, epsilon, 1. - epsilon)
+            alpha_t = y_true * alpha + (tf.ones_like(y_true) - y_true) * (1 - alpha)
+            p_t = y_true * y_pred + (tf.ones_like(y_true) - y_true) * (tf.ones_like(y_true) - y_pred)
+            focal_loss = - alpha_t * tf.pow((tf.ones_like(y_true) - p_t), gamma) * tf.math.log(p_t)
+            return tf.reduce_mean(focal_loss)
+        return focal_loss_fixed
+    
+    # Use focal loss for better class imbalance handling
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=LEARNING_RATE),
-        loss='categorical_crossentropy',
+        optimizer=keras.optimizers.Adam(learning_rate=LEARNING_RATE, beta_1=0.9, beta_2=0.999),
+        loss=focal_loss(gamma=2.0, alpha=0.25),  # Focal loss for imbalanced data
         metrics=['accuracy']
     )
     
@@ -93,10 +121,20 @@ def unfreeze_base_model(base_model, model):
     for layer in base_model.layers[:fine_tune_at]:
         layer.trainable = False
     
-    # Recompile with lower learning rate
+    # Recompile with lower learning rate and focal loss
+    def focal_loss(gamma=2.0, alpha=0.25):
+        def focal_loss_fixed(y_true, y_pred):
+            epsilon = tf.keras.backend.epsilon()
+            y_pred = tf.clip_by_value(y_pred, epsilon, 1. - epsilon)
+            alpha_t = y_true * alpha + (tf.ones_like(y_true) - y_true) * (1 - alpha)
+            p_t = y_true * y_pred + (tf.ones_like(y_true) - y_true) * (tf.ones_like(y_true) - y_pred)
+            focal_loss = - alpha_t * tf.pow((tf.ones_like(y_true) - p_t), gamma) * tf.math.log(p_t)
+            return tf.reduce_mean(focal_loss)
+        return focal_loss_fixed
+    
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=LEARNING_RATE / 10),
-        loss='categorical_crossentropy',
+        optimizer=keras.optimizers.Adam(learning_rate=LEARNING_RATE / 20, beta_1=0.9, beta_2=0.999),
+        loss=focal_loss(gamma=2.0, alpha=0.25),
         metrics=['accuracy']
     )
     
@@ -106,29 +144,31 @@ def unfreeze_base_model(base_model, model):
 def create_data_generators():
     """
     Create data generators with augmentation for training and validation
+    CRITICAL FIX: Use MobileNetV2 preprocess_input instead of rescale
     """
     print("Creating data generators with augmentation...")
     
-    # Data augmentation for training
-    # Use smaller validation split (10%) to get more training data
+    # More aggressive data augmentation for training
+    # Use MobileNetV2 preprocessing function (normalizes to [-1, 1])
     train_datagen = ImageDataGenerator(
-        rescale=1./255,
-        rotation_range=30,
-        width_shift_range=0.3,
+        preprocessing_function=preprocess_input,  # MobileNetV2 preprocessing
+        rotation_range=40,  # Increased rotation
+        width_shift_range=0.3,  # More shift
         height_shift_range=0.3,
-        shear_range=0.3,
-        zoom_range=0.3,
+        shear_range=0.3,  # More shear
+        zoom_range=0.3,  # More zoom
         horizontal_flip=True,
-        vertical_flip=True,
-        brightness_range=[0.8, 1.2],
+        vertical_flip=False,  # Keep vertical flip off for beach images
+        brightness_range=[0.7, 1.3],  # Wider brightness range
+        channel_shift_range=20,  # Color channel shifts
         fill_mode='nearest',
-        validation_split=0.1  # 90/10 split (more training data!)
+        validation_split=VAL_SPLIT
     )
     
-    # No augmentation for validation
+    # No augmentation for validation, but use MobileNetV2 preprocessing
     val_datagen = ImageDataGenerator(
-        rescale=1./255,
-        validation_split=0.1  # Match the split
+        preprocessing_function=preprocess_input,  # MobileNetV2 preprocessing
+        validation_split=VAL_SPLIT
     )
     
     # Training generator
@@ -155,7 +195,18 @@ def create_data_generators():
     print(f"Found {val_generator.samples} validation images")
     print(f"Class indices: {train_generator.class_indices}")
     
-    return train_generator, val_generator
+    # Calculate class weights to handle imbalance
+    class_counts = Counter(train_generator.classes)
+    total_samples = sum(class_counts.values())
+    num_classes = len(class_counts)
+    
+    class_weights = {}
+    for class_idx, count in class_counts.items():
+        class_weights[class_idx] = total_samples / (num_classes * count)
+    
+    print(f"Class weights (to handle imbalance): {class_weights}")
+    
+    return train_generator, val_generator, class_weights
 
 
 def train_model():
@@ -197,31 +248,34 @@ def train_model():
     model.summary()
     
     # Create data generators
-    train_generator, val_generator = create_data_generators()
+    train_generator, val_generator, class_weights = create_data_generators()
     
-    # Callbacks
+    # Enhanced callbacks for better training
     callbacks = [
         # Early stopping - stop if validation loss doesn't improve
         EarlyStopping(
-            monitor='val_loss',
-            patience=10,  # More patience (wait longer before stopping)
+            monitor='val_accuracy',  # Monitor accuracy instead of loss
+            patience=20,  # Much more patience
             restore_best_weights=True,
-            verbose=1
+            verbose=1,
+            mode='max'
         ),
-        # Save best model
+        # Save best model based on validation accuracy
         ModelCheckpoint(
             MODEL_SAVE_PATH,
             monitor='val_accuracy',
             save_best_only=True,
-            verbose=1
+            verbose=1,
+            mode='max'
         ),
         # Reduce learning rate if stuck
         ReduceLROnPlateau(
             monitor='val_loss',
-            factor=0.5,
-            patience=3,
-            min_lr=1e-7,
-            verbose=1
+            factor=0.3,  # More aggressive reduction
+            patience=5,
+            min_lr=1e-8,
+            verbose=1,
+            mode='min'
         )
     ]
     
@@ -229,12 +283,14 @@ def train_model():
     print("\n" + "=" * 60)
     print("PHASE 1: Training top layers (base model frozen)")
     print("=" * 60)
+    print(f"Training for up to 50 epochs...")
     
     history1 = model.fit(
         train_generator,
-        epochs=20,  # More epochs in phase 1
+        epochs=50,  # More epochs in phase 1
         validation_data=val_generator,
         callbacks=callbacks,
+        class_weight=class_weights,  # Handle class imbalance
         verbose=1
     )
     
@@ -242,14 +298,42 @@ def train_model():
     print("\n" + "=" * 60)
     print("PHASE 2: Fine-tuning (unfreezing top layers)")
     print("=" * 60)
+    print(f"Fine-tuning for up to {EPOCHS - 50} epochs...")
     
     unfreeze_base_model(base_model, model)
     
+    # Reset callbacks for phase 2 (new learning rate)
+    callbacks_phase2 = [
+        EarlyStopping(
+            monitor='val_accuracy',
+            patience=25,  # Even more patience for fine-tuning
+            restore_best_weights=True,
+            verbose=1,
+            mode='max'
+        ),
+        ModelCheckpoint(
+            MODEL_SAVE_PATH,
+            monitor='val_accuracy',
+            save_best_only=True,
+            verbose=1,
+            mode='max'
+        ),
+        ReduceLROnPlateau(
+            monitor='val_loss',
+            factor=0.3,
+            patience=7,
+            min_lr=1e-8,
+            verbose=1,
+            mode='min'
+        )
+    ]
+    
     history2 = model.fit(
         train_generator,
-        epochs=EPOCHS - 20,  # Adjust for new phase 1 epochs
+        epochs=EPOCHS - 50,  # Adjust for new phase 1 epochs
         validation_data=val_generator,
-        callbacks=callbacks,
+        callbacks=callbacks_phase2,
+        class_weight=class_weights,  # Handle class imbalance
         verbose=1
     )
     
@@ -260,13 +344,39 @@ def train_model():
     
     val_loss, val_accuracy = model.evaluate(val_generator, verbose=1)
     
-    print(f"\nFinal Validation Accuracy: {val_accuracy * 100:.2f}%")
+    print(f"\n{'=' * 60}")
+    print(f"FINAL RESULTS:")
+    print(f"{'=' * 60}")
+    print(f"Final Validation Accuracy: {val_accuracy * 100:.2f}%")
     print(f"Final Validation Loss: {val_loss:.4f}")
+    
+    # Per-class predictions for diagnostics
+    if HAS_SKLEARN:
+        print(f"\nPer-class predictions (validation set):")
+        val_generator.reset()
+        predictions = model.predict(val_generator, verbose=0)
+        predicted_classes = np.argmax(predictions, axis=1)
+        true_classes = val_generator.classes[:len(predicted_classes)]
+        
+        # Get class names from generator
+        class_names = list(val_generator.class_indices.keys())
+        class_indices = {v: k for k, v in val_generator.class_indices.items()}
+        
+        print(classification_report(true_classes, predicted_classes, 
+                                    target_names=[class_indices[i] for i in range(len(class_names))]))
+    else:
+        print("\n(Install sklearn for detailed per-class metrics)")
     
     if val_accuracy >= 0.85:
         print("✅ Target accuracy (85%+) achieved!")
+    elif val_accuracy >= 0.70:
+        print("⚠️  Accuracy is acceptable but could be improved.")
+        print("   Consider: adding more training data, especially for the 'oil' class")
     else:
-        print(f"⚠️  Accuracy below target. Consider training with more data or more epochs.")
+        print("⚠️  Accuracy below target. Recommendations:")
+        print("   1. Add more training images (especially 'oil' class)")
+        print("   2. Check data quality and ensure correct labels")
+        print("   3. Try training for more epochs")
     
     print(f"\nModel saved to: {MODEL_SAVE_PATH}")
     print("=" * 60)
