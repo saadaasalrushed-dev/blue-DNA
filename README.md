@@ -1,7 +1,4 @@
 # Blue DNA - AI Beach Guardian
-
-Clean, essential files only for deployment.
-
 ## 📁 Structure
 
 ```
@@ -31,15 +28,9 @@ blue_dna_clean/
 
 ## 🚀 Deploy
 
-1. Upload all files to GitHub
-2. Connect to Render/Railway/etc
-3. Deploy!
+Connect to Render/Railway/etc
 
-## ✅ Essential Files Only
 
-- Removed all documentation (.md files)
-- Removed extra CSS files (only style.css)
-- Removed extra JS files (only app.js)
-- Removed training scripts
-- Removed development files
+
+
 
